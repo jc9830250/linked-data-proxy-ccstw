@@ -9,13 +9,13 @@ var CONTENT_SELECTOR = ".AUTOANNO-content,.content";
  * @type String
  */
 if (typeof(URL_LDP) === "undefined") {
-    var URL_LDP = "http://demo-linked-data-proxy-2017.dlll.nccu.edu.tw:3258";
+    var URL_LDP = "http://linkdata.ccstw.nccu.edu.tw:3251";
 }
 if (typeof(URL_JIEBA) === "undefined") {
-    var URL_JIEBA = "http://demo-linked-data-proxy-2017.dlll.nccu.edu.tw:3253";
+    var URL_JIEBA = "http://linkdata.ccstw.nccu.edu.tw:3255";
 }
 if (typeof(URL_BASE) === "undefined") {
-    var URL_BASE = "http://demo-linked-data-proxy-2017.dlll.nccu.edu.tw:3253/";
+    var URL_BASE = "http://linkdata.ccstw.nccu.edu.tw:3255/";
 }
 
 if (typeof(URL_GA_SCRIPT) === "undefined") {

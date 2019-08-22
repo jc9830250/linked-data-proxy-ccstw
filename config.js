@@ -25,7 +25,15 @@ CONFIG = {
         "140.119.25.194:10780",
         "140.119.25.235:10240",
         "test-linked-data-proxy-2017.dlll.nccu.edu.tw:3359",
-        "pulipulichen.github.io"
+        "vinson.rd.ssic.nccu.edu.tw:10780",
+        "pulipulichen.github.io",
+        "ming.ncl.edu.tw",
+	"ljl.ssicrd.nccu.edu.tw",
+	"rd.dlll.nccu.edu.tw",
+	"demo-rd-2018.dlll.nccu.edu.tw",
+        "dspace.ccstw.nccu.edu.tw",
+        "linkdata.ccstw.nccu.edu.tw:3255",
+        "linkdata.ccstw.nccu.edu.tw:3251",
     ],
     
     // 模組的別名
