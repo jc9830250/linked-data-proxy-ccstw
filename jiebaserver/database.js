@@ -45,6 +45,9 @@ tableTermCache = sequelize.define('term_cache', {
   term: {
     type: Sequelize.TEXT
   },
+  term_pos: {
+    type: Sequelize.TEXT
+  },
   existed: {
     type: Sequelize.BOOLEAN
   }

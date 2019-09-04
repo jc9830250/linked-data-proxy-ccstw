@@ -4,21 +4,25 @@ jieba_parsing = function(dictionary, _callback) {
         FREQ = {},
         total = 0.0,
         min_freq = 0.0,
-        initialized = false;
-
+        initialized = false,
+        lpos;
     var max_of_array = function(array){return Math.max.apply(Math, array)},
         min_of_array = function(array){return Math.min.apply(Math, array)};
 
     var gen_trie = function () {
         var lfreq = {},
             trie = {},
+            lpos ={},
             ltotal = 0.0;
 
         for (var i = 0; i < dictionary.length; i++) {
             var entry = dictionary[i],
                 word = entry[0],
-                freq = entry[1];
+                freq = entry[1],
+                pos = entry[2];
+           // console.log( word+":"+pos);
             lfreq[word] = freq;
+            lpos[word] = pos;
             ltotal += freq;
             p = trie;
             for (var ci = 0; ci < word.length; ci++) {
@@ -31,7 +35,7 @@ jieba_parsing = function(dictionary, _callback) {
             p[''] = ''; // ending flag
         }
 
-        return [trie, lfreq, ltotal];
+        return [trie, lfreq, ltotal,lpos];
     }
 
     var initialize = function() {
@@ -47,7 +51,7 @@ jieba_parsing = function(dictionary, _callback) {
         trie = gar[0];
         FREQ = gar[1];
         total = gar[2];
-
+        pos_word = gar[3];
         var min_freq = Infinity;
         // normalize:
         for (k in FREQ) {
@@ -67,8 +71,9 @@ jieba_parsing = function(dictionary, _callback) {
             i = 0,
             j = 0,
             p = trie,
+            pos = pos_word,
             DAG = {};
-
+            pos_DAG = {};
         while (i < N) {
             var c = sentence[j];
             if (c in p) {
@@ -78,6 +83,7 @@ jieba_parsing = function(dictionary, _callback) {
                         DAG[i] = [];
                     }
                     DAG[i].push(j);
+                    //console.log(DAG[i]);
                 }
                 j += 1;
                 if (j >= N) {
@@ -202,12 +208,15 @@ jieba_parsing = function(dictionary, _callback) {
             N = sentence.length;
 
         while (x < N) {
+        	//console.log(route);
             y = route[x][1] + 1;
+
             l_word = sentence.substring(x, y);
-            //console.log(l_word, l_word.match(re_eng))
+            console.log(l_word, l_word.match(re_eng))
             if (l_word.match(re_eng) && l_word.length === 1) {
                 buf += l_word;
                 x = y;
+                //console.log(buf);
             }
             else {
                 if (buf.length > 0) {
@@ -224,10 +233,25 @@ jieba_parsing = function(dictionary, _callback) {
         }
         return yieldValues;
     }
+    var get_pos = function(_yieldValues,pos_list){
+			_yieldPos = [];
+			_pos_list = pos_list;
+			_yieldValues.forEach(function(element) {
+  			if(typeof _pos_list[element] !== 'undefined'){
+  				_yieldPos[element] = _pos_list[element];
 
+  			} else{
+  				_yieldPos[element] = "unknown";
+  			}
+														}); 
+			return _yieldPos ; 
+        
+    }
     var cut = function(sentence){
         var cut_all = false,
             HMM = false,
+            show_pos = true,
+            yieldPos = [],
             yieldValues = [];
 
         var re_han = /([\u4E00-\u9FA5a-zA-Z0-9+#&\._]+)/,
@@ -235,7 +259,6 @@ jieba_parsing = function(dictionary, _callback) {
 
         var blocks = sentence.split(re_han);
         var cut_block = HMM ? __cut_DAG : __cut_DAG_NO_HMM;
-
         for (b in blocks) {
             var blk = blocks[b];
             //console.log(b, blk);
@@ -261,6 +284,7 @@ jieba_parsing = function(dictionary, _callback) {
                     else if (!cut_all) {
                         for (xi in x) {
                             yieldValues.push(x[xi]);
+                            console.log(x[xi]);
                         }
                     }
                     else {
@@ -269,7 +293,9 @@ jieba_parsing = function(dictionary, _callback) {
                 }
             }
         }
-        return yieldValues;
+        _yieldPos = show_pos ? get_pos(yieldValues,pos_word) : undefined;
+       // console.log(_yieldPos);
+        return [yieldValues,_yieldPos];
     };
     
     jieba_cut = cut;
@@ -318,7 +344,8 @@ node_jieba_parsing = function (_dicts, _text, _callback) {
     
     jieba_parsing(_dict, function () {  
         var _result = jieba_cut(_text);
-        //console.log(_result.join(" "));
+        //console.log(_result[0]);
+        //console.log(_result[0]);
         _callback(_result);
     });
 };

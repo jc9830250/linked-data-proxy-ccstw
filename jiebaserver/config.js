@@ -42,5 +42,5 @@ CONFIG = {
      * 是否啟用快取
      * @type Boolean
      */
-    enable_cache: true
+    enable_cache: false
 };

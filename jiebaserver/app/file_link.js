@@ -102,3 +102,9 @@ app.get("/client/js/list.jpg", function (_req, _res) {
         _res.send(data);
     });
 });
+app.get("/client/js/pos-annotation-lib.js", function (_req, _res) {
+    fs.readFile("./client_js/pos-annotation-lib.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //pos-annotation-lib.js

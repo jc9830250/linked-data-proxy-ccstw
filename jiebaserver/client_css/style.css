@@ -6,7 +6,14 @@ a{text-decoration:none;}
 .autoanno_vocabulary.autoanno_tooltip:hover{
 	color: red;
 }
+/*
 .autoanno_highlight{
+    color: blue;
+}*/
+[data-word-pos=n]{
+    color: green;
+}
+[data-word-pos=nr]{
     color: blue;
 }
 .autoanno_highlight.hide{

@@ -22,7 +22,7 @@ if (typeof(URL_GA_SCRIPT) === "undefined") {
     var URL_GA_SCRIPT = "client/js/exp-linked-data-proxy-2017.dlll.nccu.edu.tw.js"
 }
 if (typeof(URL_MODELS) === "undefined") {
-    var URL_MODELS = "wiki,moedict,cbdb,tgaz,cdict,pixabay";
+    var URL_MODELS = "wiki,moedict,cbdb,tgaz,cdict";
 }
 
 /**
@@ -256,8 +256,8 @@ AUTOANNO._setup_tooltip = function (_element) {
         }
     });
 
-    rangy.init();
-
+    //rangy.init();
+    /*
     $(_element).mouseup(function () {
         var sel = rangy.getSelection();
         var _selection_text = sel.toString().trim();
@@ -268,7 +268,7 @@ AUTOANNO._setup_tooltip = function (_element) {
             //$(sel.getRangeAt(0)).click();
             $(sel.focusNode.parentElement).click();
         }
-    });
+    });*/
     
     return this;
 };
@@ -308,7 +308,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
         ts = instance;
     }
     var ts_trim = ts.replace(/(?:\\[rnt]|[\r\n\t　]+)+/g, "").split(" ").join("").trim();
-    ga_mouse_click_event_trigger(this, ".autoanno_tooltip", ts_trim, "searched", "mouse_click");
+    //ga_mouse_click_event_trigger(this, ".autoanno_tooltip", ts_trim, "searched", "mouse_click");
 
 
 
@@ -406,7 +406,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
                             _module = MODULE_SYMBOL[_module];
                             _module_name = MODULE_NAME[_module_name];
                         }
-                        ga_mouse_click_event_trigger(this, ".evaluate-minus-button", _term + " : " + _module, "disliked", "mouse_click");
+                        //ga_mouse_click_event_trigger(this, ".evaluate-minus-button", _term + " : " + _module, "disliked", "mouse_click");
                         $.getJSON(URL_LDP + "/" + _module + "/" + ts + "/-1?callback=?", function (result) {
 
                         });
@@ -418,7 +418,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
                     var _term = $(this).parents(".tooltipster-content:first").find(".tooltip_title:first").text().trim();
                     var _source_name = $(this).text().trim();
                     var _source_uri = $(this).attr("href");
-                    ga_mouse_click_event_trigger(this, ".evaluate-minus-button", _term + " : " + _source_name + " : " +_source_uri , "referenced", "mouse_click");
+                    //ga_mouse_click_event_trigger(this, ".evaluate-minus-button", _term + " : " + _source_name + " : " +_source_uri , "referenced", "mouse_click");
                 });
                 /*$("revealcheck").onchange(function(){
                     ga_mouse_click_event_trigger(this, ".revealcheck", "revealed" , "revealed", "mouse_click");
@@ -567,6 +567,7 @@ AUTOANNO.init = function () {
         });
 
         // $.getScript("")
+       // $.getScript(URL_BASE + URL_pos_annotation);
     });
     return this;
 };
@@ -693,6 +694,12 @@ AUTOANNO._batch_parse_batch_send = function (_content_array, _callback) {
  */
 AUTOANNO.check_jquery(function () {
     console.log("init");
+    
     AUTOANNO.init();
+    // console.log( $( this ).text() );
+
 });
 
+/**
+*監聽回傳後的值
+*/

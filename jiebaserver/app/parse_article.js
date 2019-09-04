@@ -31,6 +31,7 @@ REQUEST_COUNT = 0;
 REQUEST_COUNT_MAX = CONFIG.linked_data_proxy_request_max;
 REQUEST_CACHE_ID = [];
 
+var pos = [];
 // ------------------------
 
 /**
@@ -119,7 +120,7 @@ var _article_cache_post_process = function (article, cache_id, _callback) {
         // 3. 開始斷詞或其他的處理
         _process(article, cache_id, function (result) {
             // 4. 處理完之後放入暫存檔案 
-            //console.log("4. 處理完之後放入暫存檔案 ");
+            console.log("4. 處理完之後放入暫存檔案 ");
             //console.log(result);
             REQUEST_COUNT--;
             tableArticleCache.update(
@@ -220,8 +221,10 @@ var _node_jieba_parsing_callback = function (_result, cache_id, callback) {
     //for (var t = 0, len = _result.length; t < len; t += BATCH_CHECK) {
     //    temp_array.push(_result.slice(t, t + BATCH_CHECK));
     //}
-    temp_array[0] = _result;    // 全部一個檔案傳就好了，不要花這麼多功夫切割
-
+    temp_array[0] = _result[0];    // 全部一個檔案傳就好了，不要花這麼多功夫切割
+    pos = _result[1];
+    //console.log(pos);
+    console.log("00000000000000000");
     // array: temp_array
     // limit: temp_array.length
     // callback: callback(joined_result);
@@ -234,10 +237,10 @@ var _node_jieba_parsing_callback = function (_result, cache_id, callback) {
         if (_i < temp_array.length) {
             _retry = 0;
             sub_array = temp_array[_i];
-            _find_terms_not_in_cache(sub_array, function (_send_array_temp) {
+            _find_terms_not_in_cache(sub_array,function (_send_array_temp) {
                 _send_array = _send_array_temp;
                 sub_result = _send_array.join(" ").trim();
-                
+                console.log(sub_result);
                 if (sub_array.length === 0
                     || sub_result === ""
                     || sub_result === undefined) {
@@ -265,7 +268,7 @@ var _node_jieba_parsing_callback = function (_result, cache_id, callback) {
         _write_log([cache_id, "送出...", _i + "/" + temp_array.length
             , '詞數:' + _send_array.length + "/" + sub_array.length
             , sub_result]);
-        _init_terms_into_cache(_send_array, function () {
+        _init_terms_into_cache(_send_array,function () {
             request({
                 url: URL,
                 method: 'POST',
@@ -351,13 +354,15 @@ var _parse_check_result_array = function (sub_array, check_result_array, _callba
     
     // -----------------
     // 先把找到的check_result_array放入資料庫中
-    _update_terms_in_cache(check_result_array, function () {
-        _find_terms_existed_in_cache(sub_array, function (check_result_array) {
-            _write_log(["準備整合", check_result_array.length + "/" + sub_array.length]);
-            
+    _update_terms_in_cache(check_result_array,function () {
+        _find_terms_existed_in_cache(sub_array, function (check_result_array,check_result_pos_array) {
+            //_write_log(["準備整合", check_result_array.length + "/" + sub_array.length]);
+            console.log("123123123");
+            console.log(check_result_array);
+            _update_terms_pos_in_cache(check_result_pos_array,pos);
             //if (check_result_array !== undefined) {
                 var _is_html_tag = false;
-            
+                var _word_pos = "";
                 for (var i = 0; i < sub_array.length; i++) {
                     if (sub_array[i] === "\n" && _replace_br === true) {
                         _result.push('<br />');
@@ -398,12 +403,18 @@ var _parse_check_result_array = function (sub_array, check_result_array, _callba
                     else {
                         if (found === true) {
                             if (sub_array[i].length > 1) {
-                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip autoanno_highlight" data-tooltip-content="#autoanno_tooltip_content">'
+                               _word_pos  = pos[sub_array[i]];
+                               console.log(_word_pos);
+                               console.log("wordpos");
+                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip autoanno_highlight" data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "'+_word_pos+'">'
                                         + sub_array[i]
                                         + '</span>');
                             }
                             else {
-                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip" data-tooltip-content="#autoanno_tooltip_content">'
+                               // _word_pos  = pos[sub_array[i]];
+                               // console.log(_word_pos);
+                               // console.log("wordpos");
+                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip" data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "">'
                                         + sub_array[i]
                                         + '</span>');
                             }
@@ -505,7 +516,7 @@ uniqle_array = function(a) {
     });
 };
 
-var _find_terms_not_in_cache = function(_search_terms, _callback) {
+var _find_terms_not_in_cache = function(_search_terms,_callback) {
     if (typeof(_search_terms) !== "object" || _search_terms.length === 0) {
         _callback([]);
         return;
@@ -547,12 +558,13 @@ var _find_terms_not_in_cache = function(_search_terms, _callback) {
     });
 };
 
-var _init_terms_into_cache = function (_terms, _callback) {
+var _init_terms_into_cache = function (_terms,_callback) {
     if (typeof(_terms) !== "object" || _terms.length === 0) {
         _callback();
         return;
     }
-    
+    console.log("222222222222222222");
+    console.log("_terms");
     var _data = [];
     for (var _i = 0; _i < _terms.length; _i++) {
         _data.push({
@@ -564,14 +576,16 @@ var _init_terms_into_cache = function (_terms, _callback) {
     tableTermCache.bulkCreate(_data).then(_callback);
 };
 
-var _update_terms_in_cache = function (_terms, _callback) {
+var _update_terms_in_cache = function (_terms,_callback) {
     if (typeof(_terms) !== "object" || _terms.length === 0) {
-        _callback();
+        _callback(_terms);
         return;
     }
-    
+    console.log("1111111111111111");
+    console.log(_terms);
     tableTermCache.update(
         {existed: true},
+        //{term_pos: _pos},
         { where: {
             term: {
                 $or: _terms
@@ -584,6 +598,25 @@ var _update_terms_in_cache = function (_terms, _callback) {
     });
 };
 
+var _update_terms_pos_in_cache = function (check_result_pos_array,_pos) {
+
+    console.log(check_result_pos_array);
+    for(var _term in check_result_pos_array){
+        if(check_result_pos_array[_term] != _pos[_term]  && _pos[_term] !== undefined ) {
+            console.log("1111111111111111");
+            console.log(_pos[_term]);
+            console.log(_term);
+            tableTermCache.update(
+                {term_pos: _pos[_term]},
+                { where: {
+                            term: _term
+                                }
+                });
+        }
+    }
+    
+   console.log("done");
+};
 var _find_terms_existed_in_cache = function (_search_terms, _callback) {
     //var _result = [];
     tableTermCache.findAll({
@@ -595,9 +628,16 @@ var _find_terms_existed_in_cache = function (_search_terms, _callback) {
         }
     }).then(function (_cache_results) {
         var _cache_array = [];
+        var _cache_array_pos = [];
+        var _cache_pos = [];
         for (var _i = 0; _i < _cache_results.length; _i++) {
             _cache_array.push(_cache_results[_i].get("term"));
+            _cache_array_pos.push(_cache_results[_i].get("term_pos"));
+            _cache_pos[_cache_results[_i].get("term")] = _cache_results[_i].get("term_pos");
+           // console.log("pospos");
+           // console.log(_cache_results[_i].get("term_pos"));
         }
-        _callback(_cache_array);
+        console.log(_cache_pos)
+         _callback(_cache_array,_cache_pos);
     });
 };
