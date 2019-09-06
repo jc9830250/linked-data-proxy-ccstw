@@ -69,12 +69,16 @@ var SELECT_TEXT;
 AUTOANNO.css_list = [
     'client/css/style.css',
     'client/css/tooltipster.bundle.min.css',
-    'client/css/tooltipster-sideTip-noir.min.css'
+    'client/css/tooltipster-sideTip-noir.min.css',
+    'client/css/markus.css'
 ];
 AUTOANNO.js_list = {
     "client/js/utils.js": "link_data_proxy_utils",
     "client/js/tooltipster.bundle.min.js": "tooltipster.bundle.min.js",
-    "client/js/rangy-core.js": "rangy-core.js"
+    "client/js/rangy-core.js": "rangy-core.js",
+    "client/js/rangy-classapplier.js" : "rangy-classapplier.js",
+    "client/js/rangy-highlighter.js" : "rangy-highlighter.js",
+    "client/js/pos-annotation-lib.js" : "pos-annotation-lib.js"
 };
 
 // ----------------------------------
@@ -197,7 +201,96 @@ AUTOANNO.iframe_post_callback = function (_result, _callback) {
 };
 
 // -----------------------
+AUTOANNO._setup_pos_annotation = function(){
 
+  highlighter = rangy.createHighlighter();
+    highlighter.addClassApplier(rangy.createClassApplier("highlight", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    highlighter.addClassApplier(rangy.createClassApplier("fullName", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    highlighter.addClassApplier(rangy.createClassApplier("partialName", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    highlighter.addClassApplier(rangy.createClassApplier("timePeriod", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    highlighter.addClassApplier(rangy.createClassApplier("placeName", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    highlighter.addClassApplier(rangy.createClassApplier("officialTitle", {
+                ignoreWhiteSpace: true,
+                tagNames: ["span", "a"]
+            }));
+    function highlightSelectedText_fullName() {
+            highlighter.highlightSelection("fullName");
+            highlighter.serialize();
+        }
+    function highlightSelectedText_partialName() {
+            highlighter.highlightSelection("partialName");
+            highlighter.serialize();
+        }
+    function highlightSelectedText_timePeriod() {
+            highlighter.highlightSelection("timePeriod");
+            highlighter.serialize();
+        }
+    function highlightSelectedText_officialTitle() {
+            highlighter.highlightSelection("officialTitle");
+            highlighter.serialize();
+        }
+    function showTagBlock(position){
+    $(".tagblock").show();
+    $(".tagblock").css("top", position.top + 35);
+    $(".tagblock").css("left", position.left + 20); 
+}
+$(".deletebtn").click(function(){
+            //$("span.selected").replaceWith($("span.selected").text());
+            highlighter.unhighlightSelection();
+            //console.log(rangy.serializeSelection()+"d");
+            hideTagBlock();
+    });
+
+$( ".tagbtn" ).click(function() {
+        $("span.newSelected").addClass("selected");
+        $("span.newSelected").removeClass("newSelected");
+        
+        var currentType = $("span.selected").attr("type");
+        
+        if( currentType!="" ){
+            $("span.selected").removeClass(currentType).attr("type", "");   
+        }
+        
+        var newType = $(this).attr("type");
+
+        //$("span.selected").addClass(newType).attr("type", newType);
+                if(newType=="fullName"){
+            highlightSelectedText_fullName();
+        }else if(newType=="partialName"){
+            highlightSelectedText_partialName();
+        }else if(newType=="timePeriod"){
+            highlightSelectedText_timePeriod();
+        }else if(newType=="placeName"){
+            highlightSelectedText_placeName();
+        }else if(newType=="officialTitle"){
+            highlightSelectedText_officialTitle();
+        }
+//      console.log(rangy.serializeSelection()+ newType);
+        hideTagBlock();
+    });
+
+function hideTagBlock(){
+    $("span.newSelected").replaceWith($("span.newSelected").text());
+    $("span.selected").removeClass("selected");
+    $(".tagblock").hide();  
+                    }
+}
+//------------------------
 /**
  * 設定tooltip
  * @returns {AUTOANNO}
@@ -255,20 +348,24 @@ AUTOANNO._setup_tooltip = function (_element) {
             //instance.disable();
         }
     });
-
     //rangy.init();
-    /*
     $(_element).mouseup(function () {
         var sel = rangy.getSelection();
+        position= $(event.target).offset();
+        console.log(position);
+        //showTagBlock(position);
         var _selection_text = sel.toString().trim();
         if (_selection_text !== "") {
             console.log("顯示tooltip,載入:" + _selection_text);
             SELECT_TEXT = _selection_text;
+            showTagBlock(position);
             //console.log(sel.getRangeAt(0).getDocument());
             //$(sel.getRangeAt(0)).click();
-            $(sel.focusNode.parentElement).click();
+            //$(sel.focusNode.parentElement).click();
+            //highlightSelectedText_highlight();
+            //hideTagBlock();
         }
-    });*/
+    });
     
     return this;
 };

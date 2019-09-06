@@ -5,8 +5,47 @@
 <meta charset="UTF-8">
 <title>{{TITLE}}</title>
 <script type="text/javascript" src="/client/js/linked-data-proxy-lib.js"></script>
-<script type="text/javascript" src="/client/js/pos-annotation-lib.js"></script>
+
+<!--<link href="/client/css/markus.css" rel="stylesheet"> -->
 </head>
+<style type="text/css">
+        .highlight {
+            background-color: yellow;
+        }
+        
+        .fullName {
+            color: #d9534f;
+            font-size: 30px;
+        }
+
+	.partialName{
+            color: #f0ad4e;
+            font-size: 30px;
+	}
+
+	.timePeriod{
+            color: #5cb85c;
+            font-size: 30px;
+	}
+
+	.placeName{
+            color: #337ab7;
+            font-size: 30px;
+	}
+
+	.officialTitle{
+            color: #5bc0de;
+            font-size: 30px;
+	}
+
+/*        .note {
+            background-color: limegreen;
+        }
+
+        #summary {
+            border: dotted orange 1px;
+        }*/
+    </style>
 <script>
 var statecheck =function (x, highlight) {
 /*
@@ -22,6 +61,14 @@ var statecheck =function (x, highlight) {
 	*/
 	$(".autoanno_highlight").toggleClass("hide");
 }
+//        var serializedHighlights = decodeURIComponent(window.location.search.slice(window.location.search.indexOf("=") + 1));
+        
+
+
+
+
+
+
 </script>
 
 <body style="margin: 2em;">
@@ -32,5 +79,6 @@ var statecheck =function (x, highlight) {
 
 	<pre class="content">{{CONTENT}}</pre>
 </body>
-</html>
 
+	
+</html>

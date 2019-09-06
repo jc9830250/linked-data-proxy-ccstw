@@ -108,3 +108,43 @@ app.get("/client/js/pos-annotation-lib.js", function (_req, _res) {
         _res.send(data);
     });
 }); //pos-annotation-lib.js
+
+app.get("/client/js/rangy-classapplier.js", function (_req, _res) {
+    fs.readFile("./client_js/rangy/rangy-classapplier.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //rangy-classapplier.js
+
+app.get("/client/js/rangy-highlighter.js", function (_req, _res) {
+    fs.readFile("./client_js/rangy/rangy-highlighter.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //rangy-highlighter.js
+
+app.get("/client/js/rangy-serializer.js", function (_req, _res) {
+    fs.readFile("./client_js/rangy/rangy-serializer.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //rangy-highlighter.js
+app.get("/client/css/markus.css", function (_req, _res) {
+    fs.readFile("./client_css/markus-css/markus.css", 'utf8', function (err, data) {
+        _res.setHeader('content-type', 'text/css');
+        _res.send(data);
+    });
+});// css
+
+app.get("/client/css/bootstrap.min.css", function (_req, _res) {
+    fs.readFile("./client_css/markus-css/bootstrap.min.css", 'utf8', function (err, data) {
+        _res.setHeader('content-type', 'text/css');
+        _res.send(data);
+    });
+});// css
+app.get("/client/css/offcanvas.css", function (_req, _res) {
+    fs.readFile("./client_css/markus-css/offcanvas.css", 'utf8', function (err, data) {
+        _res.setHeader('content-type', 'text/css');
+        _res.send(data);
+    });
+});// css

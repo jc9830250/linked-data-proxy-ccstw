@@ -1,0 +1,67 @@
+.save{
+	padding: 6px 114px;
+}
+
+.tagblock {
+	width: auto;
+    height: auto;
+	margin: auto; 
+	padding: 2px;
+	border: 1px solid;
+	border-radius: 6px;
+	background-color: #fff;
+	position: absolute;
+	display: none;
+	text-align: center;
+}
+
+.glyphicon.glyphicon-globe {
+    font-size: 18px;
+}
+
+.tagtext{
+	font-size: 30px;
+}
+
+.selected{
+	background-color: yellow; 
+	display: inline; 
+	font-size: 30px;
+	
+}
+
+.newSelected{
+	background-color: yellow; 
+	display: inline; 
+	font-size: 30px;
+	
+}
+
+.fullName{
+	color: #d9534f;
+}
+
+.partialName{
+	color: #f0ad4e;
+}
+
+.timePeriod{
+	color: #5cb85c;
+}
+
+.placeName{
+	color: #337ab7;
+}
+
+.officialTitle{
+	color: #5bc0de;
+}
+
+.searchResult{
+	display: inline;
+	border: 0;
+	height: 700px;
+	width: 100%;
+}
+
+
