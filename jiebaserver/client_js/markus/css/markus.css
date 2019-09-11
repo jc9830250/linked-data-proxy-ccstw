@@ -2,12 +2,12 @@
 	padding: 6px 114px;
 }
 
-.tagblock {
+.tagblock .pos_search_result {
 	width: auto;
     height: auto;
 	margin: auto; 
 	padding: 2px;
-	border: 1px solid;
+	border: 3px solid #000;
 	border-radius: 6px;
 	background-color: #fff;
 	position: absolute;
@@ -63,5 +63,6 @@
 	height: 700px;
 	width: 100%;
 }
+
 
 

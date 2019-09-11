@@ -70,15 +70,19 @@ AUTOANNO.css_list = [
     'client/css/style.css',
     'client/css/tooltipster.bundle.min.css',
     'client/css/tooltipster-sideTip-noir.min.css',
-    'client/css/markus.css'
+    'client/css/markus.css',
+    'client/css/semantic.min.css'
 ];
 AUTOANNO.js_list = {
     "client/js/utils.js": "link_data_proxy_utils",
     "client/js/tooltipster.bundle.min.js": "tooltipster.bundle.min.js",
+    "client/js/js-cookie.js": "js-cookie.js",
+    "client/js/semantic.min.js" : "semantic.min.js",
     "client/js/rangy-core.js": "rangy-core.js",
     "client/js/rangy-classapplier.js" : "rangy-classapplier.js",
     "client/js/rangy-highlighter.js" : "rangy-highlighter.js",
-    "client/js/pos-annotation-lib.js" : "pos-annotation-lib.js"
+    "client/js/pos-annotation-lib.js" : "pos-annotation-lib.js",
+    
 };
 
 // ----------------------------------
@@ -201,96 +205,7 @@ AUTOANNO.iframe_post_callback = function (_result, _callback) {
 };
 
 // -----------------------
-AUTOANNO._setup_pos_annotation = function(){
 
-  highlighter = rangy.createHighlighter();
-    highlighter.addClassApplier(rangy.createClassApplier("highlight", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    highlighter.addClassApplier(rangy.createClassApplier("fullName", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    highlighter.addClassApplier(rangy.createClassApplier("partialName", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    highlighter.addClassApplier(rangy.createClassApplier("timePeriod", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    highlighter.addClassApplier(rangy.createClassApplier("placeName", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    highlighter.addClassApplier(rangy.createClassApplier("officialTitle", {
-                ignoreWhiteSpace: true,
-                tagNames: ["span", "a"]
-            }));
-    function highlightSelectedText_fullName() {
-            highlighter.highlightSelection("fullName");
-            highlighter.serialize();
-        }
-    function highlightSelectedText_partialName() {
-            highlighter.highlightSelection("partialName");
-            highlighter.serialize();
-        }
-    function highlightSelectedText_timePeriod() {
-            highlighter.highlightSelection("timePeriod");
-            highlighter.serialize();
-        }
-    function highlightSelectedText_officialTitle() {
-            highlighter.highlightSelection("officialTitle");
-            highlighter.serialize();
-        }
-    function showTagBlock(position){
-    $(".tagblock").show();
-    $(".tagblock").css("top", position.top + 35);
-    $(".tagblock").css("left", position.left + 20); 
-}
-$(".deletebtn").click(function(){
-            //$("span.selected").replaceWith($("span.selected").text());
-            highlighter.unhighlightSelection();
-            //console.log(rangy.serializeSelection()+"d");
-            hideTagBlock();
-    });
-
-$( ".tagbtn" ).click(function() {
-        $("span.newSelected").addClass("selected");
-        $("span.newSelected").removeClass("newSelected");
-        
-        var currentType = $("span.selected").attr("type");
-        
-        if( currentType!="" ){
-            $("span.selected").removeClass(currentType).attr("type", "");   
-        }
-        
-        var newType = $(this).attr("type");
-
-        //$("span.selected").addClass(newType).attr("type", newType);
-                if(newType=="fullName"){
-            highlightSelectedText_fullName();
-        }else if(newType=="partialName"){
-            highlightSelectedText_partialName();
-        }else if(newType=="timePeriod"){
-            highlightSelectedText_timePeriod();
-        }else if(newType=="placeName"){
-            highlightSelectedText_placeName();
-        }else if(newType=="officialTitle"){
-            highlightSelectedText_officialTitle();
-        }
-//      console.log(rangy.serializeSelection()+ newType);
-        hideTagBlock();
-    });
-
-function hideTagBlock(){
-    $("span.newSelected").replaceWith($("span.newSelected").text());
-    $("span.selected").removeClass("selected");
-    $(".tagblock").hide();  
-                    }
-}
-//------------------------
 /**
  * 設定tooltip
  * @returns {AUTOANNO}
@@ -299,7 +214,8 @@ AUTOANNO._setup_tooltip = function (_element) {
 
     var _TOOLTIP_LOCK = false;
     var _TOOLTIP_CONTENT;
-    _element.find('.autoanno_tooltip').tooltipster({
+   _element.find('.autoanno_tooltip').tooltipster({
+    //$('.autoanno_tooltip').tooltipster({
         //maxWidth: 400,
         contentAsHTML: true,
         interactive: true,
@@ -310,6 +226,7 @@ AUTOANNO._setup_tooltip = function (_element) {
             if (_TOOLTIP_LOCK === true) {
                 instance.close(function () {
                     _TOOLTIP_LOCK = false;
+                    console.log(helper.origin);
                     $(helper.origin).click();
                 });
                 return false;
@@ -349,7 +266,8 @@ AUTOANNO._setup_tooltip = function (_element) {
         }
     });
     //rangy.init();
-    $(_element).mouseup(function () {
+
+   $(_element).mouseup(function () { //手動標註
         var sel = rangy.getSelection();
         position= $(event.target).offset();
         console.log(position);
@@ -366,7 +284,26 @@ AUTOANNO._setup_tooltip = function (_element) {
             //hideTagBlock();
         }
     });
-    
+
+    $(_element).on("click",'.fullName',function(){
+        _query_text = $(this).text();
+        console.log(_query_text);
+        _position= $(event.target).offset();
+        _add_term_mode = true;
+        _TOOLTIP_CONTENT = $('<div">'
+                    + '<img src="' + URL_BASE + 'client/js/loading.gif" />'
+                    + '<br />Loading</div>');
+                //$("#linked_data_proxy_result").append(_TOOLTIP_CONTENT);
+                $(".pos_search_result").html(_TOOLTIP_CONTENT);
+                showPosBlock(_position);
+        AUTOANNO.query(_query_text, _add_term_mode, function (_result) {
+            _TOOLTIP_CONTENT = _result;
+                        console.log(_result);
+                        //(helper.tooltip).find(".tooltipster-content").html(_TOOLTIP_CONTENT);
+                        $("#linked_data_proxy_result").html(_TOOLTIP_CONTENT);
+                        $(".pos_search_result").html(_TOOLTIP_CONTENT);
+        });
+    });
     return this;
 };
 
@@ -434,7 +371,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
 
                     });
                     $.getJSON(URL_LDP + "/add_term?callback=?", {term: term_value, cache_id: cache_id}, function (result) {
-                        ga_mouse_click_event_trigger(this, ".term-add-button", term_value_trim, "collaboration", "mouse_click");
+                        //ga_mouse_click_event_trigger(this, ".term-add-button", term_value_trim, "collaboration", "mouse_click");
                     });
 
                 }
@@ -463,7 +400,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
 
                     // GA event
                     // ga_mouse_click_event_trigger(_obj, _selector, _name, _event_type, _event_key)
-                    ga_mouse_click_event_trigger(this, ".module-select-button", _data_module + ": "+ _term , "watched", "mouse_click");
+                    //ga_mouse_click_event_trigger(this, ".module-select-button", _data_module + ": "+ _term , "watched", "mouse_click");
                 });
 
                 _menu.append(_menu_button);
@@ -486,7 +423,7 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
                             _module = MODULE_SYMBOL[_module];
                             _module_name = MODULE_NAME[_module_name];
                         }
-                        ga_mouse_click_event_trigger(this, ".evaluate-plus-button", _term + " : " + _module, "liked", "mouse_click");
+                        //ga_mouse_click_event_trigger(this, ".evaluate-plus-button", _term + " : " + _module, "liked", "mouse_click");
                         //ts = encodeURIComponent(ts);
                         $.getJSON(URL_LDP + "/" + _module + "/" + ts + "/1?callback=?", function (result) {
 
@@ -638,7 +575,7 @@ AUTOANNO.init = function () {
 
     $(function () {
         
-        $.getScript(URL_BASE + URL_GA_SCRIPT);
+       // $.getScript(URL_BASE + URL_GA_SCRIPT);
 
         
         // 網頁讀取完成之後才會做

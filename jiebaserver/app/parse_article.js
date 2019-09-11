@@ -406,7 +406,8 @@ var _parse_check_result_array = function (sub_array, check_result_array, _callba
                                _word_pos  = pos[sub_array[i]];
                                console.log(_word_pos);
                                console.log("wordpos");
-                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip autoanno_highlight" data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "'+_word_pos+'">'
+                               class_word_pos = "pos_" + _word_pos;
+                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip autoanno_highlight '+class_word_pos+ '"data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "'+_word_pos+'">'
                                         + sub_array[i]
                                         + '</span>');
                             }
@@ -414,7 +415,7 @@ var _parse_check_result_array = function (sub_array, check_result_array, _callba
                                // _word_pos  = pos[sub_array[i]];
                                // console.log(_word_pos);
                                // console.log("wordpos");
-                                _result.push('<span class="autoanno_vocabulary autoanno_tooltip" data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "">'
+                                _result.push('<span class="autoanno_vocabulary" data-tooltip-content="#autoanno_tooltip_content" data-word-pos = "">'
                                         + sub_array[i]
                                         + '</span>');
                             }

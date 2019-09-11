@@ -148,3 +148,24 @@ app.get("/client/css/offcanvas.css", function (_req, _res) {
         _res.send(data);
     });
 });// css
+
+app.get("/client/css/semantic.min.css", function (_req, _res) {
+    fs.readFile("./client_js/semantic-ui/semantic.min.css", 'utf8', function (err, data) {
+        _res.setHeader('content-type', 'text/css');
+        _res.send(data);
+    });
+});// css
+
+app.get("/client/js/semantic.min.js", function (_req, _res) {
+    fs.readFile("./client_js/semantic-ui/semantic.min.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //semantic.min.js
+
+app.get("/client/js/js-cookie.js", function (_req, _res) {
+    fs.readFile("./client_js/js-cookie.js", function (err, data) {
+        _res.setHeader('content-type', 'text/javascript');
+        _res.send(data);
+    });
+}); //js-cookie.js.min.js
