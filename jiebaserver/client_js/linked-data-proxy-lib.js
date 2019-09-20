@@ -203,6 +203,55 @@ AUTOANNO.iframe_post_callback = function (_result, _callback) {
     
     return this;
 };
+//------------------------
+/**
+ * 斷詞詞性初始設定
+ * @returns _element
+ */
+AUTOANNO._setup_word_pos = function(_element){
+    _element.find('.autoanno_tooltip').each(function(){
+        if($(this).hasClass('pos_nr')){
+            $(this).addClass('fullName');
+            //rangy.getSelection($(this));
+
+            //console.log();
+        } 
+        if ($(this).hasClass('pos_m')){
+            $(this).addClass('timePeriod');
+        }
+    });
+    return _element;
+}
+
+/**
+ * 修正詞性抽取設定
+ * @returns _element
+ */
+AUTOANNO._setup_modified_word_pos = function(_element){
+    var available_pos = ['fullName', 'partialName', 'timePeriod', 'placeName', 'officialTitle'];
+    var entity = "";
+    _element.find('.autoanno_tooltip').each(function(){
+    _find_class = $(this).attr('class').split(' ');
+    console.log(_find_class);
+    $.each(available_pos,function(index,value){
+         console.log(value);
+         if($.inArray(value,_find_class) != -1){
+            _entity = value;
+            return false;
+         }else{
+            _entity = "unknown";
+            return ;
+         }
+       });
+
+    $(this).attr('data-name-entity',_entity);
+    });
+    return _element;
+}
+
+
+
+
 
 // -----------------------
 
@@ -214,8 +263,9 @@ AUTOANNO._setup_tooltip = function (_element) {
 
     var _TOOLTIP_LOCK = false;
     var _TOOLTIP_CONTENT;
+    _element = AUTOANNO._setup_word_pos(_element);
+   _element = AUTOANNO._setup_modified_word_pos(_element);
    _element.find('.autoanno_tooltip').tooltipster({
-    //$('.autoanno_tooltip').tooltipster({
         //maxWidth: 400,
         contentAsHTML: true,
         interactive: true,
@@ -223,6 +273,10 @@ AUTOANNO._setup_tooltip = function (_element) {
         theme: 'tooltipster-noir',
         //contentCloning: true,
         functionBefore: function (instance, helper) {
+            if($('#tagblock').is(":visible")){
+                console.log("hide tooltip");
+                return false;
+            }
             if (_TOOLTIP_LOCK === true) {
                 instance.close(function () {
                     _TOOLTIP_LOCK = false;
@@ -277,6 +331,7 @@ AUTOANNO._setup_tooltip = function (_element) {
             console.log("顯示tooltip,載入:" + _selection_text);
             SELECT_TEXT = _selection_text;
             showTagBlock(position);
+            //$('.tooltipster-noir').hide();
             //console.log(sel.getRangeAt(0).getDocument());
             //$(sel.getRangeAt(0)).click();
             //$(sel.focusNode.parentElement).click();
@@ -284,24 +339,29 @@ AUTOANNO._setup_tooltip = function (_element) {
             //hideTagBlock();
         }
     });
-
-    $(_element).on("click",'.fullName',function(){
+//20190911手動標註的查詢
+    $(_element).on("click",'.fullName,.partialName,.timePeriod ,.placeName ,.officialTitle',function(){
         _query_text = $(this).text();
         console.log(_query_text);
+        if($(this).hasClass("tooltipstered")){
+            return false;
+        }
         _position= $(event.target).offset();
         _add_term_mode = true;
         _TOOLTIP_CONTENT = $('<div">'
                     + '<img src="' + URL_BASE + 'client/js/loading.gif" />'
                     + '<br />Loading</div>');
                 //$("#linked_data_proxy_result").append(_TOOLTIP_CONTENT);
-                $(".pos_search_result").html(_TOOLTIP_CONTENT);
-                showPosBlock(_position);
+        $(".pos_search_result").html(_TOOLTIP_CONTENT);
+        showPosBlock(_position);
+        //console.log(_query_text);
         AUTOANNO.query(_query_text, _add_term_mode, function (_result) {
             _TOOLTIP_CONTENT = _result;
-                        console.log(_result);
-                        //(helper.tooltip).find(".tooltipster-content").html(_TOOLTIP_CONTENT);
-                        $("#linked_data_proxy_result").html(_TOOLTIP_CONTENT);
-                        $(".pos_search_result").html(_TOOLTIP_CONTENT);
+            console.log("11111111111");
+            console.log(_result);
+            //(helper.tooltip).find(".tooltipster-content").html(_TOOLTIP_CONTENT);
+            $("#linked_data_proxy_result").html(_TOOLTIP_CONTENT);
+            $(".pos_search_result").html(_TOOLTIP_CONTENT);
         });
     });
     return this;
@@ -342,19 +402,25 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
         ts = instance;
     }
     var ts_trim = ts.replace(/(?:\\[rnt]|[\r\n\t　]+)+/g, "").split(" ").join("").trim();
+    var _pos_term = ts_trim;
     //ga_mouse_click_event_trigger(this, ".autoanno_tooltip", ts_trim, "searched", "mouse_click");
-
+    /*var _pos_slection = '<select>'+
+                        '<option value="volvo">Volvo</option>'+
+                        '<option value="saab">Saab</option>'+
+                        '<option value="opel">Opel</option>'+
+                        '<option value="audi">Audi</option>'+
+                        '</select>';*/
 
 
     var _url = URL_LDP + "/" + URL_MODELS + "/" + ts_trim + "?callback=?";
     $.getJSON(_url, function (_data) {
+        console.log(_data);
         var _result = $("<div></div>");
         var _que = $("<div></div>").addClass("que").appendTo(_result);
         var _menu = $("<div></div>").addClass("menu").appendTo(_result);
 
         var _que_text = '<h2 class="tooltip_title">查詢字詞: ' + ts_trim + '</h2>';
         _que.append(_que_text);
-
         if (add_term_mode === true) {
             var _addterm_button = $('<input type="button" id="term" class=".term-add-button" data-term="' + ts_trim + '" value="添加新詞">');
             if (AUTOANNO.setup_finished === false) {
@@ -378,6 +444,31 @@ AUTOANNO.query = function (instance, add_term_mode, callback) {
             });
 
             _addterm_button.prependTo(_que);
+        }else{
+
+            var _correct_term_pos_button = $('<input type="button" id="pos" class=".term-add-button" data-pos="' + _pos_term + '" value="修正"><input type="button" id="term" class=".term-add-button" data-term="' + ts_trim + '" value="修正詞性">');
+            if (AUTOANNO.setup_finished === false) {
+                _correct_term_pos_button.hide();
+            } 
+            _correct_term_pos_button.css({
+                "float": "right"
+            });
+            _correct_term_pos_button.click(function () {
+                console.log($(this).data());
+                console.log($('#pos').data());
+                /*var term_value = $(this).data("term");
+                var term_value_trim = term_value.replace(/(?:\\[rnt]|[\r\n\t　]+)+/g, "").split(" ").join("").trim();
+                if (window.confirm('確認將「' + term_value_trim + '」是否更新詞庫?')) {
+                    $.getJSON(URL_JIEBA + "/add_term?callback=?", {term: term_value, cache_id: cache_id}, function (result) {
+
+                    });
+                    $.getJSON(URL_LDP + "/add_term?callback=?", {term: term_value, cache_id: cache_id}, function (result) {
+                        //ga_mouse_click_event_trigger(this, ".term-add-button", term_value_trim, "collaboration", "mouse_click");
+                    });
+
+                }*/
+            });
+            _correct_term_pos_button.prependTo(_que);
         }
 
         for (var _i = 0; _i < _data.length; _i++) {

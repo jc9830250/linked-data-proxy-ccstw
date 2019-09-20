@@ -10,12 +10,7 @@ a{text-decoration:none;}
 .autoanno_highlight{
     color: blue;
 }*/
-[data-word-pos=n]{
-    color: green;
-}
-[data-word-pos=nr]{
-    color: blue;
-}
+
 .autoanno_highlight.hide{
     color: inherit;
 }

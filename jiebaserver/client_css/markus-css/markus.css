@@ -39,22 +39,27 @@
 
 .fullName{
 	color: #d9534f;
+	text-decoration:underline;
 }
 
 .partialName{
 	color: #f0ad4e;
+	text-decoration:underline;
 }
 
 .timePeriod{
 	color: #5cb85c;
+	text-decoration:underline;
 }
 
 .placeName{
 	color: #337ab7;
+	text-decoration:underline;
 }
 
 .officialTitle{
 	color: #5bc0de;
+	text-decoration:underline;
 }
 
 .searchResult{
